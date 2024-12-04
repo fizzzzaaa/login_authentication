@@ -1,6 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'home_admin.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // Initialize Firebase
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: AuthScreen(),
+    );
+  }
+}
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -12,6 +27,7 @@ class _AuthScreenState extends State<AuthScreen> {
   final _passwordController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isPasswordVisible = false;
+  String _message = ''; // To display login success or failure message
 
   // Login method
   Future<void> _login() async {
@@ -22,42 +38,15 @@ class _AuthScreenState extends State<AuthScreen> {
       );
 
       if (userCredential.user != null) {
-        print('Login Successful');
-        // Show success message
-        _showMessageBox('Login Successful', Colors.blue);
-        // Navigate to PortfolioHome screen after login
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => PortfolioHome()),
-        );
+        setState(() {
+          _message = 'Login Successful';
+        });
       }
     } catch (e) {
-      print('Login failed: $e');
-      _showMessageBox('Login failed: $e', Colors.red);
+      setState(() {
+        _message = 'Login failed: $e';
+      });
     }
-  }
-
-  // Method to show the message box
-  void _showMessageBox(String message, Color color) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: color,
-        title: Text('Message', style: TextStyle(color: Colors.white)),
-        content: Text(message, style: TextStyle(color: Colors.white)),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text(
-              'OK',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -148,6 +137,21 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 ),
                 SizedBox(height: 20),
+                // Display Message for Login Status
+                if (_message.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Text(
+                      _message,
+                      style: TextStyle(
+                        color: _message.startsWith('Login Successful')
+                            ? Colors.green
+                            : Colors.red,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 // Sign Up Text
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -156,7 +160,6 @@ class _AuthScreenState extends State<AuthScreen> {
                     TextButton(
                       onPressed: () {
                         // Navigate to SignUp screen
-                        // Navigator.pushNamed(context, '/signUp');
                       },
                       child: Text(
                         'Sign Up',
