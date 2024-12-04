@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'home_admin.dart';
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -24,8 +25,11 @@ class _AuthScreenState extends State<AuthScreen> {
         print('Login Successful');
         // Show success message
         _showMessageBox('Login Successful', Colors.blue);
-        // Navigate to home screen
-        // Navigator.pushReplacementNamed(context, '/home');
+        // Navigate to PortfolioHome screen after login
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => PortfolioHome()),
+        );
       }
     } catch (e) {
       print('Login failed: $e');
@@ -138,9 +142,8 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                   child: Text(
                     'Login',
-
                     style: TextStyle(
-                        color :Colors.white,
+                        color: Colors.white,
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
